@@ -1,0 +1,141 @@
+Sub StockDataLoops()
+
+'Set data type
+    Dim Name As String
+    Dim Value As Double
+    Dim I As Double
+    Dim j As Double
+    Dim DateOpen, DateClose, O, C As Double
+    Dim Change As Double
+
+'Run loops without refreshing
+Application.ScreenUpdating = False
+
+'Run loops across all worksheets
+For Each sh In Worksheets
+    sh.Activate
+    
+'Define Variables
+    j = 2
+    I = 2
+    DateOpen = Cells(j, 2).Value
+    
+'Define Labels for new columns
+    Cells(1, 9).Value = "Ticker"
+    Cells(1, 12).Value = "Total Volume"
+    Cells(1, 10).Value = "Yearly Change"
+    Cells(1, 11).Value = "Percent Change"
+    
+'Create Loop to define name as variable
+Do While Cells(j, 1) <> ""
+    Name = Cells(j, 1).Value
+    Value = 0
+'Nest loop to get value of total stock as long as Name remains the same
+        Do While Cells(j, 1).Value = Name
+            
+        'Create loop to get Open and Close value to calculate change
+                If Cells(j, 2).Value <= DateOpen Then
+                O = Cells(j, 3).Value
+                
+                ElseIf Cells(j, 2).Value > DateOpen Then
+                C = Cells(j, 6).Value
+                
+                End If
+            
+ 'Finish getting total stock
+        Value = Value + Cells(j, 7).Value
+        j = j + 1
+        Loop
+ 
+ 'Calculate change
+    Change = C - O
+ 
+'Calculate percent change
+    If O = 0 Then
+        Cells(I, 11).Value = ""
+    ElseIf O <> 0 Then
+        Cells(I, 11).Value = Change / O
+    End If
+    
+'Complete variable placement loops
+    Cells(I, 9).Value = Name
+    Cells(I, 12).Value = Value
+    Cells(I, 10).Value = Change
+    
+'Adjust Color
+    If Cells(I, 10) <= 0 Then
+    Cells(I, 10).Interior.ColorIndex = 3
+    Else
+    Cells(I, 10).Interior.ColorIndex = 4
+    End If
+    
+    I = I + 1
+Loop
+
+'Format Percent Change Column as Percentage
+    Range("K:K").Select
+    Selection.Style = "Percent"
+    
+'Label Cells
+    Range("O2").Value = "Greatest % Increase"
+    Range("O3").Value = "Greatest % Decrease"
+    Range("O4").Value = "Greatest Total Volume"
+    Range("P1").Value = "Ticker"
+    Range("Q1").Value = "Value"
+
+'Declare Variables
+    Dim MaxP, MinP, GTV As Double
+    Dim LastRow As Long
+    Dim HiTick, LoTick, GTick As String
+
+'Define Variables
+
+    h = 2
+    LastRow = Cells(Rows.Count, 12).End(xlUp).Row
+
+
+'Create loop to find the max and min for percent and total volume
+For h = 2 To LastRow
+   MaxP = WorksheetFunction.Max(Range("K:K"))
+   MinP = WorksheetFunction.Min(Range("K:K"))
+   GTV = WorksheetFunction.Max(Range("L:L"))
+    
+   'For total volume, if the cell equals the max volume then save ticker name
+    If Cells(h, 12).Value = GTV Then
+    GTick = Cells(h, 9).Value
+    End If
+    
+   'For Percent Change, if the cell equals greatest increase then save ticker name
+    If Cells(h, 11).Value = MaxP Then
+    HiTick = Cells(h, 9).Value
+    End If
+    
+   'For Percent Change, if the cell equals greatest decrease then save ticker name
+    If Cells(h, 11).Value = MinP Then
+    LoTick = Cells(h, 9).Value
+    End If
+
+Next h
+
+'Format Percent Change Column as Percentage
+    Range("Q2:Q3").Select
+    Selection.Style = "Percent"
+'Format Column Width
+    Range("A:Q").Select
+    Selection.EntireColumn.AutoFit
+    
+'Place values in appropriate cells
+    Cells(2, 17).Value = MaxP
+    Cells(3, 17).Value = MinP
+    Cells(4, 17).Value = GTV
+    Cells(4, 16).Value = GTick
+    Cells(3, 16).Value = LoTick
+    Cells(2, 16).Value = HiTick
+
+Next sh
+Application.ScreenUpdating = True
+
+End Sub
+
+
+
