@@ -1,2 +1,2 @@
 # CompletedWork
-Homework assignments completed for boot camp.
+Completed homework and assignments.
